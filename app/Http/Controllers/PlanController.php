@@ -6,6 +6,8 @@ use App\Http\Resources\PlanResource;
 use App\Models\Plan;
 use App\Services\PdfService;
 use App\Services\PlanService;
+use Carbon\Carbon;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 
 class PlanController extends Controller
@@ -42,7 +44,9 @@ class PlanController extends Controller
             'date' => 'required|date',
             'location' => 'required|string'
         ]);
-
+        if(!Carbon::create($input['date'])->isAfter(Carbon::now())) {
+            return response()->json(['error' => 'A data precisa ser maior que a data atual'], 500);
+        }
         $plan = $this->service->create($input);
         return new PlanResource($plan);
     }
